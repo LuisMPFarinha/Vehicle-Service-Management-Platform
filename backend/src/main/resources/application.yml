@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: vehicle-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/vehicle_service}
+    username: ${SPRING_DATASOURCE_USERNAME:vehicle_service}
+    password: ${SPRING_DATASOURCE_PASSWORD:vehicle_service}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  aws:
+    region: ${AWS_REGION:eu-west-1}
+    service-completed-topic-arn: ${SERVICE_COMPLETED_TOPIC_ARN:}

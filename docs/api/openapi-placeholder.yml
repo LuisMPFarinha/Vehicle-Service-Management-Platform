@@ -1,0 +1,20 @@
+openapi: 3.0.3
+info:
+  title: Vehicle Service Management API
+  version: 0.1.0
+  description: Placeholder API specification for training exercises.
+paths:
+  /api/vehicles:
+    post:
+      summary: Create a vehicle
+      description: TODO implement during the create-vehicle exercise.
+      responses:
+        '201':
+          description: Vehicle created
+  /api/service-requests:
+    post:
+      summary: Open a service request
+      description: TODO implement during the open-request exercise.
+      responses:
+        '201':
+          description: Service request opened
