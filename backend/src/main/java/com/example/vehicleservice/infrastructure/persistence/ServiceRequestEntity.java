@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "service_requests")
-public class JpaServiceRequestEntity {
+public class ServiceRequestEntity {
 
     @Id
     private UUID id;
@@ -42,7 +42,7 @@ public class JpaServiceRequestEntity {
     @Column(name = "completed_at")
     private Instant completedAt;
 
-    protected JpaServiceRequestEntity() {
+    protected ServiceRequestEntity() {
     }
 
     // TODO: Add mapping methods when implementing persistence.

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface SpringDataVehicleJpaRepository extends JpaRepository<JpaVehicleEntity, UUID> {
+public interface SpringDataVehicleJpaRepository extends JpaRepository<VehicleEntity, UUID> {
 
-    Optional<JpaVehicleEntity> findByRegistrationNumber(String registrationNumber);
+    Optional<VehicleEntity> findByRegistrationNumber(String registrationNumber);
 }

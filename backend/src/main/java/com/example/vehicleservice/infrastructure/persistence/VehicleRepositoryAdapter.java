@@ -2,29 +2,33 @@ package com.example.vehicleservice.infrastructure.persistence;
 
 import com.example.vehicleservice.domain.model.Vehicle;
 import com.example.vehicleservice.domain.repository.VehicleRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class JpaVehicleRepositoryAdapter implements VehicleRepository {
+@RequiredArgsConstructor
+public class VehicleRepositoryAdapter implements VehicleRepository {
+    private final SpringDataVehicleJpaRepository jpaRepository;
 
     @Override
     public Vehicle save(Vehicle vehicle) {
-        // TODO: Map domain model to JPA entity and persist.
-        return vehicle;
+        VehicleEntity entity = VehicleEntity.fromDomain(vehicle);
+        VehicleEntity savedEntity = jpaRepository.save(entity);
+        return savedEntity.toDomain();
     }
 
     @Override
     public Optional<Vehicle> findById(UUID id) {
-        // TODO: Load entity and map to domain model.
-        return Optional.empty();
+        return jpaRepository.findById(id).map(VehicleEntity::toDomain);
     }
 
     @Override
     public Optional<Vehicle> findByRegistrationNumber(String registrationNumber) {
-        // TODO: Load entity and map to domain model.
-        return Optional.empty();
+        return jpaRepository.findByRegistrationNumber(registrationNumber).map(VehicleEntity::toDomain);
     }
 }

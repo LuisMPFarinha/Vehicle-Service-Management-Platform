@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public class JpaServiceRequestRepositoryAdapter implements ServiceRequestRepository {
+public class ServiceRequestRepositoryAdapter implements ServiceRequestRepository {
 
     @Override
     public ServiceRequest save(ServiceRequest serviceRequest) {
