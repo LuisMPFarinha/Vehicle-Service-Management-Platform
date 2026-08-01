@@ -2,18 +2,22 @@ package com.example.vehicleservice.infrastructure.persistence;
 
 import com.example.vehicleservice.domain.model.ServiceRequest;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@RequiredArgsConstructor
 public class ServiceRequestRepositoryAdapter implements ServiceRequestRepository {
+    private final SpringDataServiceRequestJpaRepository jpaRepository;
 
     @Override
     public ServiceRequest save(ServiceRequest serviceRequest) {
-        // TODO: Map domain model to JPA entity and persist.
-        return serviceRequest;
+        ServiceRequestEntity serviceRequestEntity = ServiceRequestEntity.fromDomain(serviceRequest);
+        ServiceRequestEntity savedEntity = jpaRepository.save(serviceRequestEntity);
+        return savedEntity.toDomain();
     }
 
     @Override

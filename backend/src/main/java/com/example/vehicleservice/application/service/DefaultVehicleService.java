@@ -18,21 +18,21 @@ public class DefaultVehicleService implements VehicleService {
     @Override
     public VehicleResponse createVehicle(CreateVehicleCommand command) {
         vehicleRepository.findByRegistrationNumber(command.registrationNumber())
-                .ifPresent(existingVehicle -> {
-                    throw new VehicleAlreadyExistsException(command.registrationNumber());
-                });
+            .ifPresent(existingVehicle -> {
+                throw new VehicleAlreadyExistsException(command.registrationNumber());
+            });
 
         Vehicle vehicle = Vehicle.create(
-                command.registrationNumber(),
-                command.model(),
-                command.ownerName());
+            command.registrationNumber(),
+            command.model(),
+            command.ownerName());
 
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
 
         return new VehicleResponse(
-                savedVehicle.getId(),
-                savedVehicle.getRegistrationNumber(),
-                savedVehicle.getModel(),
-                savedVehicle.getOwnerName());
+            savedVehicle.getId(),
+            savedVehicle.getRegistrationNumber(),
+            savedVehicle.getModel(),
+            savedVehicle.getOwnerName());
     }
 }

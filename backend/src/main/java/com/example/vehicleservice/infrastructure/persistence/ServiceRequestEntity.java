@@ -1,6 +1,7 @@
 package com.example.vehicleservice.infrastructure.persistence;
 
 import com.example.vehicleservice.domain.model.Priority;
+import com.example.vehicleservice.domain.model.ServiceRequest;
 import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,5 +46,40 @@ public class ServiceRequestEntity {
     protected ServiceRequestEntity() {
     }
 
-    // TODO: Add mapping methods when implementing persistence.
+    private ServiceRequestEntity(UUID id, UUID vehicleId, String description, Priority priority, ServiceRequestStatus status, String assignedTechnician, Instant createdAt, Instant completedAt) {
+        this.id = id;
+        this.vehicleId = vehicleId;
+        this.description = description;
+        this.priority = priority;
+        this.status = status;
+        this.assignedTechnician = assignedTechnician;
+        this.createdAt = createdAt;
+        this.completedAt = completedAt;
+    }
+
+    static ServiceRequestEntity fromDomain(ServiceRequest serviceRequest) {
+        return new ServiceRequestEntity(
+            serviceRequest.getId(),
+            serviceRequest.getVehicleId(),
+            serviceRequest.getDescription(),
+            serviceRequest.getPriority(),
+            serviceRequest.getStatus(),
+            serviceRequest.getAssignedTechnician(),
+            serviceRequest.getCreatedAt(),
+            serviceRequest.getCompletedAt()
+        );
+    }
+
+    ServiceRequest toDomain() {
+        return ServiceRequest.restore(
+            id,
+            vehicleId,
+            description,
+            priority,
+            status,
+            assignedTechnician,
+            createdAt,
+            completedAt
+        );
+    }
 }

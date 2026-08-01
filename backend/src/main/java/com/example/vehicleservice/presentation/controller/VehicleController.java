@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/vehicles")
 public class VehicleController {
 
-    private final VehicleService vehicleApplicationService;
+    private final VehicleService vehicleService;
 
-    public VehicleController(VehicleService vehicleApplicationService) {
-        this.vehicleApplicationService = vehicleApplicationService;
+    public VehicleController(VehicleService vehicleService) {
+        this.vehicleService = vehicleService;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     VehicleResponse createVehicle(@RequestBody CreateVehicleCommand command) {
-        return vehicleApplicationService.createVehicle(command);
+        return vehicleService.createVehicle(command);
     }
 }
