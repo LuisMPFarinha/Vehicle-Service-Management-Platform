@@ -1,10 +1,12 @@
 package com.example.vehicleservice.infrastructure.persistence;
 
 import com.example.vehicleservice.domain.model.ServiceRequest;
+import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +30,10 @@ public class ServiceRequestRepositoryAdapter implements ServiceRequestRepository
 
     @Override
     public boolean existsActiveDuplicate(UUID vehicleId, String description) {
-        // TODO: Implement duplicate-active-request query.
-        return false;
+        return jpaRepository.existsByVehicleIdAndDescriptionAndStatusIn(
+            vehicleId,
+            description,
+            List.of(ServiceRequestStatus.OPEN, ServiceRequestStatus.IN_PROGRESS, ServiceRequestStatus.WAITING_FOR_PARTS)
+        );
     }
 }

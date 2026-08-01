@@ -1,10 +1,11 @@
 package com.example.vehicleservice.infrastructure.persistence;
 
+import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public interface SpringDataServiceRequestJpaRepository extends JpaRepository<ServiceRequestEntity, UUID> {
-
-    // TODO: Add query methods during filtering and duplicate-prevention exercises.
+    boolean existsByVehicleIdAndDescriptionAndStatusIn(UUID vehicleId, String description, Collection<ServiceRequestStatus> statuses);
 }
