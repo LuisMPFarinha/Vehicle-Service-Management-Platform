@@ -4,9 +4,9 @@ import com.example.vehicleservice.application.dto.AssignTechnicianCommand;
 import com.example.vehicleservice.application.dto.OpenServiceRequestCommand;
 import com.example.vehicleservice.application.dto.ServiceRequestResponse;
 import com.example.vehicleservice.application.exception.ServiceRequestAlreadyExistsException;
+import com.example.vehicleservice.application.exception.ServiceRequestNotFoundException;
 import com.example.vehicleservice.application.exception.VehicleNotFoundException;
 import com.example.vehicleservice.domain.model.ServiceRequest;
-import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
 import com.example.vehicleservice.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,31 +36,31 @@ public class DefaultServiceRequestService implements ServiceRequestService {
 
         ServiceRequest savedServiceRequest = serviceRequestRepository.save(serviceRequest);
 
-        return new ServiceRequestResponse(
-            savedServiceRequest.getId(),
-            savedServiceRequest.getVehicleId(),
-            savedServiceRequest.getDescription(),
-            savedServiceRequest.getPriority(),
-            savedServiceRequest.getStatus(),
-            savedServiceRequest.getAssignedTechnician(),
-            savedServiceRequest.getCreatedAt(),
-            savedServiceRequest.getCompletedAt()
-        );
+        return toServiceRequestResponse(savedServiceRequest);
     }
 
     @Override
     public ServiceRequestResponse assignTechnician(AssignTechnicianCommand command) {
+        ServiceRequest serviceRequest = serviceRequestRepository.findById(command.serviceRequestId())
+            .orElseThrow(() -> new ServiceRequestNotFoundException(command.serviceRequestId()));
 
+        serviceRequest.assignTechnician(command.technicianName());
 
+        ServiceRequest savedServiceRequest = serviceRequestRepository.save(serviceRequest);
+
+        return toServiceRequestResponse(savedServiceRequest);
+    }
+
+    private ServiceRequestResponse toServiceRequestResponse(ServiceRequest serviceRequest) {
         return new ServiceRequestResponse(
-            command.serviceRequestId(),
-            null,
-            null,
-            null,
-            ServiceRequestStatus.IN_PROGRESS,
-            command.technicianName(),
-            null,
-            null
+            serviceRequest.getId(),
+            serviceRequest.getVehicleId(),
+            serviceRequest.getDescription(),
+            serviceRequest.getPriority(),
+            serviceRequest.getStatus(),
+            serviceRequest.getAssignedTechnician(),
+            serviceRequest.getCreatedAt(),
+            serviceRequest.getCompletedAt()
         );
     }
 }

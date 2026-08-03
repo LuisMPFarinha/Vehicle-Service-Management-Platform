@@ -1,10 +1,14 @@
 package com.example.vehicleservice.unit;
 
+import com.example.vehicleservice.application.dto.AssignTechnicianCommand;
 import com.example.vehicleservice.application.dto.OpenServiceRequestCommand;
 import com.example.vehicleservice.application.exception.ServiceRequestAlreadyExistsException;
 import com.example.vehicleservice.application.exception.VehicleNotFoundException;
 import com.example.vehicleservice.application.service.DefaultServiceRequestService;
+import com.example.vehicleservice.domain.exception.DomainRuleViolationException;
 import com.example.vehicleservice.domain.model.Priority;
+import com.example.vehicleservice.domain.model.ServiceRequest;
+import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.domain.model.Vehicle;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
 import com.example.vehicleservice.domain.repository.VehicleRepository;
@@ -15,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -70,6 +75,23 @@ class ServiceRequestRulesTest {
             .isInstanceOf(ServiceRequestAlreadyExistsException.class);
 
         verify(serviceRequestRepository, never()).save(any());
+    }
+
+    @Test
+    void throwsWhenTechnicianAssignedToInactiveServiceRequest() {
+        ServiceRequest cancelledRequest = ServiceRequest.restore(
+            UUID.randomUUID(),
+            vehicle.getId(),
+            description,
+            Priority.MEDIUM,
+            ServiceRequestStatus.CANCELLED,
+            null,
+            Instant.now(),
+            null
+        );
+
+        assertThatThrownBy(() -> cancelledRequest.assignTechnician("Tiago"))
+            .isInstanceOf(DomainRuleViolationException.class);
     }
 
     @Test

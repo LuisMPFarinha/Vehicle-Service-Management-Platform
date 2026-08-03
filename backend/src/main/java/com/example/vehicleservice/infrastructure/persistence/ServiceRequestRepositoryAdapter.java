@@ -23,10 +23,7 @@ public class ServiceRequestRepositoryAdapter implements ServiceRequestRepository
     }
 
     @Override
-    public Optional<ServiceRequest> findById(UUID id) {
-        // TODO: Load entity and map to domain model.
-        return Optional.empty();
-    }
+    public Optional<ServiceRequest> findById(UUID id) { return jpaRepository.findById(id).map(ServiceRequestEntity::toDomain); }
 
     @Override
     public boolean existsActiveDuplicate(UUID vehicleId, String description) {

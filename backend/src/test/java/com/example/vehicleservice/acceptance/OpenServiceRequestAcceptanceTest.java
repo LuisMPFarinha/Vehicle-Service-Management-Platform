@@ -2,6 +2,7 @@ package com.example.vehicleservice.acceptance;
 
 import com.example.vehicleservice.application.dto.*;
 import com.example.vehicleservice.domain.model.Priority;
+import com.example.vehicleservice.domain.model.ServiceRequest;
 import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.presentation.error.ApiErrorResponse;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.shaded.com.google.common.util.concurrent.Service;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,25 +26,13 @@ class OpenServiceRequestAcceptanceTest {
 
     @Test
     void opensServiceRequestForExistingVehicle() {
-        var createCommand = createVehicleCommand("AA-00-01");
-        var vehicleResponse = restTemplate.postForEntity(
-            "/api/vehicles",
-            createCommand,
-            VehicleResponse.class
-        );
-
+        var vehicleResponse = createVehicle("AA-00-01");
         assertThat(vehicleResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
-        OpenServiceRequestCommand serviceRequestCommand = new OpenServiceRequestCommand(
+        var serviceRequestResponse = openServiceRequest(
             vehicleResponse.getBody().id(),
             "Needs to change tires",
             Priority.MEDIUM
-        );
-
-        var serviceRequestResponse = restTemplate.postForEntity(
-            "/api/service-requests",
-            serviceRequestCommand,
-            ServiceRequestResponse.class
         );
 
         assertThat(serviceRequestResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
@@ -56,13 +49,7 @@ class OpenServiceRequestAcceptanceTest {
 
     @Test
     void rejectsDuplicateActiveServiceRequest() {
-        var createCommand = createVehicleCommand("AA-00-02");
-        var vehicleResponse = restTemplate.postForEntity(
-            "/api/vehicles",
-            createCommand,
-            VehicleResponse.class
-        );
-
+        var vehicleResponse = createVehicle("AA-00-02");
         assertThat(vehicleResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
         OpenServiceRequestCommand serviceRequestCommand = new OpenServiceRequestCommand(
@@ -90,11 +77,57 @@ class OpenServiceRequestAcceptanceTest {
                 + " and description Needs to change tires already exists");
     }
 
-    private CreateVehicleCommand createVehicleCommand(String registrationNumber) {
-        return new CreateVehicleCommand(
+    @Test
+    void AssignsTechnicianToActiveServiceRequest() {
+        var vehicleResponse = createVehicle("AA-00-03");
+        assertThat(vehicleResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var openServiceResponse = openServiceRequest(
+            vehicleResponse.getBody().id(),
+            "Needs to change tires",
+            Priority.MEDIUM
+        );
+        assertThat(openServiceResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        AssignTechnicianCommand assignTechnicianCommand = new AssignTechnicianCommand(
+            openServiceResponse.getBody().id(),
+            "Tiago"
+        );
+
+        var assignTechnicianResponse = restTemplate.patchForObject(
+            "/api/service-requests/" + openServiceResponse.getBody().id() + "/technician",
+            assignTechnicianCommand,
+            ServiceRequestResponse.class
+        );
+
+        assertThat(assignTechnicianResponse.assignedTechnician()).isEqualTo("Tiago");
+        assertThat(assignTechnicianResponse.status()).isEqualTo(ServiceRequestStatus.OPEN);
+    }
+
+    private ResponseEntity<VehicleResponse> createVehicle(String registrationNumber) {
+        CreateVehicleCommand command = new CreateVehicleCommand(
             registrationNumber,
             "Volkswagen Golf",
             "Luis"
+        );
+        return restTemplate.postForEntity(
+            "/api/vehicles",
+            command,
+            VehicleResponse.class
+        );
+    }
+
+    private ResponseEntity<ServiceRequestResponse> openServiceRequest(UUID vehicleId, String description, Priority priority) {
+        OpenServiceRequestCommand serviceRequestCommand = new OpenServiceRequestCommand(
+            vehicleId,
+            description,
+            priority
+        );
+
+        return restTemplate.postForEntity(
+            "/api/service-requests",
+            serviceRequestCommand,
+            ServiceRequestResponse.class
         );
     }
 }

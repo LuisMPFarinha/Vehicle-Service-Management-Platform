@@ -33,6 +33,6 @@ public class ServiceRequestController {
 
     @PatchMapping("/{id}/technician")
     ServiceRequestResponse assignTechnician(@PathVariable UUID id, @RequestBody AssignTechnicianCommand command) {
-        return serviceRequestService.assignTechnician(command);
+        return serviceRequestService.assignTechnician(new AssignTechnicianCommand(id, command.technicianName()));
     }
 }

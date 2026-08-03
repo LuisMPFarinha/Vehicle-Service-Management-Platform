@@ -1,5 +1,6 @@
 package com.example.vehicleservice.domain.model;
 
+import com.example.vehicleservice.domain.exception.DomainRuleViolationException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,7 +40,15 @@ public class ServiceRequest {
     }
 
     public boolean isActive() {
-        // TODO: Implement active-state rules during the service-request exercises.
-        return false;
+        return this.status == ServiceRequestStatus.OPEN || this.status == ServiceRequestStatus.IN_PROGRESS || this.status == ServiceRequestStatus.WAITING_FOR_PARTS;
+    }
+
+    public void assignTechnician(String technician) {
+        if(!this.isActive()) throw new DomainRuleViolationException("Only active service requests can be assigned");
+        this.assignedTechnician = technician;
+    }
+
+    public void updateStatus(ServiceRequestStatus status) {
+        this.status = status;
     }
 }

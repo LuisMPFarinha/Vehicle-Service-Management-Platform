@@ -1,9 +1,7 @@
 package com.example.vehicleservice.presentation.error;
 
-import com.example.vehicleservice.application.exception.ServiceRequestAlreadyExistsException;
-import com.example.vehicleservice.application.exception.VehicleAlreadyExistsException;
+import com.example.vehicleservice.application.exception.*;
 
-import com.example.vehicleservice.application.exception.VehicleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -32,6 +30,18 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ServiceRequestAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     ApiErrorResponse handleServiceRequestAlreadyExists(ServiceRequestAlreadyExistsException exception) {
+        return new ApiErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler(AssignTechnicianOnInactiveServiceRequestException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    ApiErrorResponse handleAssignTechnicianOnInactiveServiceRequest(AssignTechnicianOnInactiveServiceRequestException exception) {
+        return new ApiErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler(ServiceRequestNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    ApiErrorResponse handleServiceRequestNotFound(ServiceRequestNotFoundException exception) {
         return new ApiErrorResponse(exception.getMessage());
     }
 }

@@ -1,7 +1,6 @@
 package com.example.vehicleservice.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import com.example.vehicleservice.domain.model.Priority;
 import com.example.vehicleservice.domain.model.ServiceRequest;
 import com.example.vehicleservice.domain.model.Vehicle;
@@ -24,15 +23,16 @@ class ServiceRequestRepositoryIntegrationTest {
     VehicleRepository vehicleRepository;
 
     private Vehicle savedVehicle;
+    private ServiceRequest savedServiceRequest;
 
     @BeforeEach
     void setUp() {
         savedVehicle = vehicleRepository.save(Vehicle.create(
-            "AA-00-03",
+            "SR-REPO-00-01",
             "Tesla",
             "Mudambi"
         ));
-        serviceRequestRepository.save(ServiceRequest.create(
+        savedServiceRequest = serviceRequestRepository.save(ServiceRequest.create(
             savedVehicle.getId(),
             "tire change",
             Priority.MEDIUM
@@ -49,5 +49,14 @@ class ServiceRequestRepositoryIntegrationTest {
     void returnsFalseWhenSameVehicleHasDifferentDescription() {
         boolean result = serviceRequestRepository.existsActiveDuplicate(savedVehicle.getId(), "change filter");
         assertThat(result).isFalse();
+    }
+
+    @Test
+    void savesAssignedTechnician() {
+        savedServiceRequest.assignTechnician("Tiago");
+
+        ServiceRequest result = serviceRequestRepository.save(savedServiceRequest);
+
+        assertThat(result.getAssignedTechnician()).isEqualTo("Tiago");
     }
 }
