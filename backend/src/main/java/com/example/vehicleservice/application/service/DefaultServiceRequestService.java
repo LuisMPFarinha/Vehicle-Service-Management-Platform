@@ -12,6 +12,8 @@ import com.example.vehicleservice.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class DefaultServiceRequestService implements ServiceRequestService {
@@ -45,6 +47,18 @@ public class DefaultServiceRequestService implements ServiceRequestService {
             .orElseThrow(() -> new ServiceRequestNotFoundException(command.serviceRequestId()));
 
         serviceRequest.assignTechnician(command.technicianName());
+
+        ServiceRequest savedServiceRequest = serviceRequestRepository.save(serviceRequest);
+
+        return toServiceRequestResponse(savedServiceRequest);
+    }
+
+    @Override
+    public ServiceRequestResponse completeRequest(UUID id) {
+        ServiceRequest serviceRequest = serviceRequestRepository.findById(id)
+            .orElseThrow(() -> new ServiceRequestNotFoundException(id));
+
+        serviceRequest.complete();
 
         ServiceRequest savedServiceRequest = serviceRequestRepository.save(serviceRequest);
 

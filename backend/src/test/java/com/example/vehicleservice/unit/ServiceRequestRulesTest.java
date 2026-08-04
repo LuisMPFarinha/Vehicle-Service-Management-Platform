@@ -95,18 +95,65 @@ class ServiceRequestRulesTest {
     }
 
     @Test
-    @Disabled("Training exercise: implement the domain rule test-first.")
     void completedRequestCannotReturnToOpen() {
-        // Given a completed service request
-        // When a transition to OPEN is attempted
-        // Then a domain rule violation should be raised
+        ServiceRequest completedRequest = ServiceRequest.restore(
+            UUID.randomUUID(),
+            vehicle.getId(),
+            description,
+            Priority.MEDIUM,
+            ServiceRequestStatus.COMPLETED,
+            "Tiago",
+            Instant.now(),
+            null
+        );
+
+        assertThatThrownBy(completedRequest::open)
+            .isInstanceOf(DomainRuleViolationException.class);
     }
 
     @Test
-    @Disabled("Training exercise: implement the completion rule test-first.")
     void requestCannotBeCompletedWithoutAssignedTechnician() {
-        // Given an open service request without an assigned technician
-        // When it is completed
-        // Then a domain rule violation should be raised
+        ServiceRequest openRequest = ServiceRequest.create(
+            vehicle.getId(),
+            description,
+            Priority.MEDIUM
+        );
+
+        assertThatThrownBy(openRequest::complete)
+            .isInstanceOf(DomainRuleViolationException.class);
+    }
+
+    @Test
+    void requestCannotBeCompletedIfCancelled() {
+        ServiceRequest cancelledRequest = ServiceRequest.restore(
+            UUID.randomUUID(),
+            vehicle.getId(),
+            description,
+            Priority.MEDIUM,
+            ServiceRequestStatus.CANCELLED,
+            "Tiago",
+            Instant.now(),
+            null
+        );
+
+        assertThatThrownBy(cancelledRequest::complete)
+            .isInstanceOf(DomainRuleViolationException.class);
+    }
+
+    @Test
+    void requestCannotBeCompletedIfAlreadyCompleted() {
+        ServiceRequest completedRequest = ServiceRequest.restore(
+            UUID.randomUUID(),
+            vehicle.getId(),
+            description,
+            Priority.MEDIUM,
+            ServiceRequestStatus.COMPLETED,
+            "Tiago",
+            Instant.now(),
+            null
+        );
+
+        assertThatThrownBy(completedRequest::complete)
+            .isInstanceOf(DomainRuleViolationException.class);
     }
 }

@@ -48,7 +48,25 @@ public class ServiceRequest {
         this.assignedTechnician = technician;
     }
 
-    public void updateStatus(ServiceRequestStatus status) {
-        this.status = status;
+    public void complete() {
+        if(ValidationUtils.isBlank(this.assignedTechnician)) {
+            throw new DomainRuleViolationException("Request needs an assigned technician to be completed");
+        }
+        if(this.status.equals(ServiceRequestStatus.CANCELLED)) {
+            throw new DomainRuleViolationException("Cancelled request cannot be completed");
+        }
+        else if(this.status.equals(ServiceRequestStatus.COMPLETED)) {
+            throw new DomainRuleViolationException("Request was already completed");
+        }
+
+        this.status = ServiceRequestStatus.COMPLETED;
+        this.completedAt = Instant.now();
+    }
+
+    public void open() {
+        if(this.status.equals(ServiceRequestStatus.COMPLETED))
+            throw new DomainRuleViolationException("Completed request cannot be opened again");
+
+        this.status = ServiceRequestStatus.OPEN;
     }
 }

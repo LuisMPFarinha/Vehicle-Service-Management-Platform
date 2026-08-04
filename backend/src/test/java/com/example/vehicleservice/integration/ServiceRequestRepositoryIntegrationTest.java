@@ -3,6 +3,7 @@ package com.example.vehicleservice.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import com.example.vehicleservice.domain.model.Priority;
 import com.example.vehicleservice.domain.model.ServiceRequest;
+import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.domain.model.Vehicle;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
 import com.example.vehicleservice.domain.repository.VehicleRepository;
@@ -58,5 +59,15 @@ class ServiceRequestRepositoryIntegrationTest {
         ServiceRequest result = serviceRequestRepository.save(savedServiceRequest);
 
         assertThat(result.getAssignedTechnician()).isEqualTo("Tiago");
+    }
+
+    @Test
+    void completeAServiceRequest() {
+        savedServiceRequest.assignTechnician("Tiago");
+        ServiceRequest requestWithTechnician = serviceRequestRepository.save(savedServiceRequest);
+        requestWithTechnician.complete();
+        ServiceRequest result = serviceRequestRepository.save(requestWithTechnician);
+        assertThat(result.getStatus()).isEqualTo(ServiceRequestStatus.COMPLETED);
+        assertThat(result.getCompletedAt()).isNotNull();
     }
 }

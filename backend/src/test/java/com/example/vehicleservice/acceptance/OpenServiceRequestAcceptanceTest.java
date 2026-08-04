@@ -78,7 +78,7 @@ class OpenServiceRequestAcceptanceTest {
     }
 
     @Test
-    void AssignsTechnicianToActiveServiceRequest() {
+    void assignsTechnicianToActiveServiceRequest() {
         var vehicleResponse = createVehicle("AA-00-03");
         assertThat(vehicleResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 
@@ -102,6 +102,38 @@ class OpenServiceRequestAcceptanceTest {
 
         assertThat(assignTechnicianResponse.assignedTechnician()).isEqualTo("Tiago");
         assertThat(assignTechnicianResponse.status()).isEqualTo(ServiceRequestStatus.OPEN);
+    }
+
+    @Test
+    void completesServiceRequest() {
+        var vehicleResponse = createVehicle("AA-00-04");
+        assertThat(vehicleResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var openServiceResponse = openServiceRequest(
+            vehicleResponse.getBody().id(),
+            "Needs to change tires",
+            Priority.MEDIUM
+        );
+        assertThat(openServiceResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        AssignTechnicianCommand assignTechnicianCommand = new AssignTechnicianCommand(
+            openServiceResponse.getBody().id(),
+            "Tiago"
+        );
+        restTemplate.patchForObject(
+            "/api/service-requests/" + openServiceResponse.getBody().id() + "/technician",
+            assignTechnicianCommand,
+            ServiceRequestResponse.class
+        );
+
+        ServiceRequestResponse response = restTemplate.patchForObject(
+            "/api/service-requests/" + openServiceResponse.getBody().id() + "/complete",
+            null,
+            ServiceRequestResponse.class
+        );
+
+        assertThat(response.status()).isEqualTo(ServiceRequestStatus.COMPLETED);
+        assertThat(response.completedAt()).isNotNull();
     }
 
     private ResponseEntity<VehicleResponse> createVehicle(String registrationNumber) {

@@ -35,4 +35,9 @@ public class ServiceRequestController {
     ServiceRequestResponse assignTechnician(@PathVariable UUID id, @RequestBody AssignTechnicianCommand command) {
         return serviceRequestService.assignTechnician(new AssignTechnicianCommand(id, command.technicianName()));
     }
+
+    @PatchMapping("/{id}/complete")
+    ServiceRequestResponse completeRequest(@PathVariable UUID id) {
+        return serviceRequestService.completeRequest(id);
+    }
 }
