@@ -4,14 +4,14 @@ import com.example.vehicleservice.application.dto.AssignTechnicianCommand;
 import com.example.vehicleservice.application.dto.OpenServiceRequestCommand;
 import com.example.vehicleservice.application.dto.ServiceRequestResponse;
 import com.example.vehicleservice.application.service.ServiceRequestService;
+import com.example.vehicleservice.domain.model.Priority;
+import com.example.vehicleservice.domain.model.ServiceRequestStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -39,5 +39,15 @@ public class ServiceRequestController {
     @PatchMapping("/{id}/complete")
     ServiceRequestResponse completeRequest(@PathVariable UUID id) {
         return serviceRequestService.completeRequest(id);
+    }
+
+    @GetMapping
+    Page<ServiceRequestResponse> findFiltered(
+        @RequestParam(required = false) ServiceRequestStatus status,
+        @RequestParam(required = false) Priority priority,
+        @RequestParam(required = false) String regNum,
+        @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC)
+        Pageable pageable) {
+        return serviceRequestService.findFiltered(status, priority, regNum, pageable);
     }
 }

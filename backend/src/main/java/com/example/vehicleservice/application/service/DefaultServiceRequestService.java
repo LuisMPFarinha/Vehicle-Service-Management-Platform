@@ -6,10 +6,14 @@ import com.example.vehicleservice.application.dto.ServiceRequestResponse;
 import com.example.vehicleservice.application.exception.ServiceRequestAlreadyExistsException;
 import com.example.vehicleservice.application.exception.ServiceRequestNotFoundException;
 import com.example.vehicleservice.application.exception.VehicleNotFoundException;
+import com.example.vehicleservice.domain.model.Priority;
 import com.example.vehicleservice.domain.model.ServiceRequest;
+import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
 import com.example.vehicleservice.domain.repository.VehicleRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -63,6 +67,11 @@ public class DefaultServiceRequestService implements ServiceRequestService {
         ServiceRequest savedServiceRequest = serviceRequestRepository.save(serviceRequest);
 
         return toServiceRequestResponse(savedServiceRequest);
+    }
+
+    @Override
+    public Page<ServiceRequestResponse> findFiltered(ServiceRequestStatus status, Priority priority, String regNum, Pageable pageable) {
+        return serviceRequestRepository.findFiltered(status, priority, regNum, pageable).map(this::toServiceRequestResponse);
     }
 
     private ServiceRequestResponse toServiceRequestResponse(ServiceRequest serviceRequest) {

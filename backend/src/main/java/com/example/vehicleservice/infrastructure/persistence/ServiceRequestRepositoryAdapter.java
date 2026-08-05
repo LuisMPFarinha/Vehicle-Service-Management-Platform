@@ -1,9 +1,12 @@
 package com.example.vehicleservice.infrastructure.persistence;
 
+import com.example.vehicleservice.domain.model.Priority;
 import com.example.vehicleservice.domain.model.ServiceRequest;
 import com.example.vehicleservice.domain.model.ServiceRequestStatus;
 import com.example.vehicleservice.domain.repository.ServiceRequestRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -23,7 +26,9 @@ public class ServiceRequestRepositoryAdapter implements ServiceRequestRepository
     }
 
     @Override
-    public Optional<ServiceRequest> findById(UUID id) { return jpaRepository.findById(id).map(ServiceRequestEntity::toDomain); }
+    public Optional<ServiceRequest> findById(UUID id) {
+        return jpaRepository.findById(id).map(ServiceRequestEntity::toDomain);
+    }
 
     @Override
     public boolean existsActiveDuplicate(UUID vehicleId, String description) {
@@ -32,5 +37,10 @@ public class ServiceRequestRepositoryAdapter implements ServiceRequestRepository
             description,
             List.of(ServiceRequestStatus.OPEN, ServiceRequestStatus.IN_PROGRESS, ServiceRequestStatus.WAITING_FOR_PARTS)
         );
+    }
+
+    @Override
+    public Page<ServiceRequest> findFiltered(ServiceRequestStatus status, Priority priority, String regNum, Pageable pageable) {
+        return jpaRepository.findFiltered(status, priority, regNum, pageable).map(ServiceRequestEntity::toDomain);
     }
 }

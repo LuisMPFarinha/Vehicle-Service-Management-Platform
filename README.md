@@ -34,6 +34,9 @@ Start PostgreSQL:
 docker compose up postgres
 ```
 
+The database is exposed on local port `5433` to avoid collisions with other
+projects that use the default PostgreSQL port `5432`.
+
 Run the backend:
 
 ```bash

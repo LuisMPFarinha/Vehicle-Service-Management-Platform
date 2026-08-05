@@ -12,11 +12,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.example.vehicleservice.domain.model.Vehicle;
 import com.example.vehicleservice.domain.repository.VehicleRepository;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@Sql(statements = {"DELETE FROM service_requests", "DELETE FROM vehicles"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class VehicleRepositoryIntegrationTest {
 
     @Autowired

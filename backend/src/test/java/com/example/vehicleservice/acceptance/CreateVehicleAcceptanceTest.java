@@ -9,12 +9,14 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import com.example.vehicleservice.application.dto.CreateVehicleCommand;
 import com.example.vehicleservice.application.dto.VehicleResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Sql(statements = {"DELETE FROM service_requests", "DELETE FROM vehicles"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class CreateVehicleAcceptanceTest {
     
     @Autowired
