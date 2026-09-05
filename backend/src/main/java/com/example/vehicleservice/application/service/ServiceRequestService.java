@@ -11,12 +11,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface ServiceRequestService {
-
     ServiceRequestResponse openRequest(OpenServiceRequestCommand command);
-
     ServiceRequestResponse assignTechnician(AssignTechnicianCommand command);
-
     ServiceRequestResponse completeRequest(UUID id);
-
     Page<ServiceRequestResponse> findFiltered(ServiceRequestStatus status, Priority priority, String regNum, Pageable pageable);
 }
