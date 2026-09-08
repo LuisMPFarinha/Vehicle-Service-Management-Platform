@@ -17,3 +17,10 @@ export interface ServiceRequest {
   createdAt: string;
   completedAt?: string;
 }
+export interface ServiceRequestFilters {
+  status?: ServiceRequestStatus;
+  priority?: Priority;
+  regNum?: string;
+  page?: number;
+  size?: number;
+}

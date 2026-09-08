@@ -20,7 +20,7 @@ public interface SpringDataServiceRequestJpaRepository extends JpaRepository<Ser
         JOIN VehicleEntity v ON sr.vehicleId = v.id
         WHERE (:status IS NULL OR sr.status = :status)
           AND (:priority IS NULL OR sr.priority = :priority)
-          AND (:regNum IS NULL OR LOWER(v.registrationNumber) LIKE LOWER(CONCAT('%', :regNum, '%')))
+          AND (:regNum IS NULL OR LOWER(v.registrationNumber) LIKE CONCAT('%', LOWER(CAST(:regNum AS string)), '%'))
         """)
     Page<ServiceRequestEntity> findFiltered(
         @Param("status") ServiceRequestStatus status,

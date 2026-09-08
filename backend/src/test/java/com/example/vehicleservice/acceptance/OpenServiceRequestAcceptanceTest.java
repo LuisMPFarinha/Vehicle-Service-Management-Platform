@@ -164,6 +164,33 @@ class OpenServiceRequestAcceptanceTest {
             .isEqualTo(openServiceResponse.getBody().id().toString());
     }
 
+    @Test
+    void findFilteredWithoutFilters() {
+        var vehicleResponse = createVehicle("AA-00-06");
+        assertThat(vehicleResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        var openServiceResponse = openServiceRequest(
+            vehicleResponse.getBody().id(),
+            "Needs oil service",
+            Priority.HIGH
+        );
+        assertThat(openServiceResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+
+        ResponseEntity<JsonNode> response = restTemplate.getForEntity(
+            "/api/service-requests?page=0&size=20",
+            JsonNode.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        JsonNode content = response.getBody().get("content");
+
+        assertThat(content).isNotNull();
+        assertThat(content).hasSize(1);
+        assertThat(content.get(0).get("id").asText())
+            .isEqualTo(openServiceResponse.getBody().id().toString());
+    }
+
     private ResponseEntity<VehicleResponse> createVehicle(String registrationNumber) {
         CreateVehicleCommand command = new CreateVehicleCommand(
             registrationNumber,
