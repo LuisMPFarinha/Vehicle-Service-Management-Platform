@@ -1,8 +1,9 @@
 import { Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Priority, ServiceRequest, ServiceRequestStatus } from '../types/serviceRequest';
 import { PageResponse } from '../types/pagination';
 import { findFilteredServiceRequests } from '../api/serviceRequestApi';
+import { CreateServiceRequestPanel } from './CreateServiceRequestPanel';
 
 export function ServiceRequestsPage() {
   const [regNum, setRegNum] = useState("");
@@ -12,20 +13,9 @@ export function ServiceRequestsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<PageResponse<ServiceRequest> | null>(null);
+  const [showPanel, setShowPanel] = useState(false);
 
-  useEffect(() => {
-    loadServiceRequests();
-  }, [debouncedRegNum, status, priority])
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setDebouncedRegNum(regNum);
-    }, 300);
-
-    return () => window.clearTimeout(timeout);
-  }, [regNum]);
-
-  const loadServiceRequests = async () => {
+  const loadServiceRequests = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -42,7 +32,23 @@ export function ServiceRequestsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [debouncedRegNum, status, priority]);
+
+  const closeShowPanel = useCallback(() => {
+    setShowPanel(false);
+  }, []);
+
+  useEffect(() => {
+    loadServiceRequests();
+  }, [loadServiceRequests])
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setDebouncedRegNum(regNum);
+    }, 300);
+
+    return () => window.clearTimeout(timeout);
+  }, [regNum]);
 
   const renderServiceRequests = () => {
     if (isLoading) {
@@ -83,55 +89,57 @@ export function ServiceRequestsPage() {
   }
 
   return (
-    <section>
-      <header className="page-header">
-        <div>
-          <h1>Service Requests</h1>
-          <p>Build loading, empty, success, error, and filter states here.</p>
+    showPanel ?
+      <CreateServiceRequestPanel closeShowPanel={closeShowPanel} loadServiceRequests={loadServiceRequests}/> :
+      <section>
+        <header className="page-header">
+          <div>
+            <h1>Service Requests</h1>
+            <p>Build loading, empty, success, error, and filter states here.</p>
+          </div>
+          <button type="button" onClick={() => setShowPanel(true)}>
+            <Plus size={18} /> New request
+          </button>
+        </header>
+
+        <div className="toolbar" aria-label="Request filters">
+          <input aria-label="Vehicle registration" placeholder="Registration"
+            value={regNum} onChange={(e) => setRegNum(e.target.value)} />
+          <select aria-label="Status" value={status}
+            onChange={(e) => setStatus(e.target.value as ServiceRequestStatus | "")}>
+            <option value="">All statuses</option>
+            <option>OPEN</option>
+            <option>IN_PROGRESS</option>
+            <option>WAITING_FOR_PARTS</option>
+            <option>COMPLETED</option>
+            <option>CANCELLED</option>
+          </select>
+          <select aria-label="Priority" value={priority}
+            onChange={(e) => setPriority(e.target.value as Priority | "")}>
+            <option value="">All priorities</option>
+            <option>LOW</option>
+            <option>MEDIUM</option>
+            <option>HIGH</option>
+            <option>URGENT</option>
+          </select>
         </div>
-        <button type="button">
-          <Plus size={18} /> New request
-        </button>
-      </header>
 
-      <div className="toolbar" aria-label="Request filters">
-        <input aria-label="Vehicle registration" placeholder="Registration"
-          value={regNum} onChange={(e) => setRegNum(e.target.value)} />
-        <select aria-label="Status" value={status}
-          onChange={(e) => setStatus(e.target.value as ServiceRequestStatus | "")}>
-          <option value="">All statuses</option>
-          <option>OPEN</option>
-          <option>IN_PROGRESS</option>
-          <option>WAITING_FOR_PARTS</option>
-          <option>COMPLETED</option>
-          <option>CANCELLED</option>
-        </select>
-        <select aria-label="Priority" value={priority}
-          onChange={(e) => setPriority(e.target.value as Priority | "")}>
-          <option value="">All priorities</option>
-          <option>LOW</option>
-          <option>MEDIUM</option>
-          <option>HIGH</option>
-          <option>URGENT</option>
-        </select>
-      </div>
-
-      <div className="panel">
-        <table>
-          <thead>
-            <tr>
-              <th>Vehicle</th>
-              <th>Description</th>
-              <th>Priority</th>
-              <th>Status</th>
-              <th>Technician</th>
-            </tr>
-          </thead>
-          <tbody>
-            {renderServiceRequests()}
-          </tbody>
-        </table>
-      </div>
-    </section>
+        <div className="panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Vehicle</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Technician</th>
+              </tr>
+            </thead>
+            <tbody>
+              {renderServiceRequests()}
+            </tbody>
+          </table>
+        </div>
+      </section>
   );
 }

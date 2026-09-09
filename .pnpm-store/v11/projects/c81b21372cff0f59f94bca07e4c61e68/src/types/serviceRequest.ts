@@ -8,15 +8,22 @@ export type ServiceRequestStatus =
   | 'CANCELLED';
 
 export interface ServiceRequest {
-  id: string;
+  id?: string;
   vehicleId: string;
   description: string;
   priority: Priority;
-  status: ServiceRequestStatus;
+  status?: ServiceRequestStatus;
   assignedTechnician?: string;
-  createdAt: string;
+  createdAt?: string;
   completedAt?: string;
 }
+
+export interface OpenServiceRequestCommand {
+  vehicleId: string;
+  description: string;
+  priority: Priority;
+}
+
 export interface ServiceRequestFilters {
   status?: ServiceRequestStatus;
   priority?: Priority;

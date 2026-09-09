@@ -127,6 +127,31 @@ button {
   gap: 8px;
 }
 
+.stacked-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stacked-form input,
+.stacked-form button {
+  width: 100%;
+}
+
+.stacked-form label {
+  color: #566573;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
